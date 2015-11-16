@@ -1,0 +1,8 @@
+{
+  "AppSettings": {
+    "SiteTitle": "ReactCards"
+  },
+  "Data": {
+    "ConnectionString": "Server=(localdb)\\v11.0;Database=ReactCards;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}

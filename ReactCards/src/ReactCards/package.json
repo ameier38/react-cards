@@ -1,0 +1,11 @@
+{
+  "name": "ASP.NET",
+  "version": "0.0.0",
+  "devDependencies": {
+    "babelify": "7.2.0",
+    "browserify": "12.0.1",
+    "gulp": "^3.9.0",
+    "reactify": "1.1.1",
+    "vinyl-source-stream2": "0.1.1"
+  }
+}

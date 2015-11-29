@@ -42,10 +42,11 @@ body {
     color: #777;
 }
 
-a.card-header:focus, a.card-header:hover {
+.card-header.clickable:focus, .card-header.clickable:hover {
     color: #555;
     text-decoration: none;
     background-color: #f5f5f5;
+    cursor: pointer;
 }
 
 .card .card-header .card-header-date {
@@ -53,9 +54,13 @@ a.card-header:focus, a.card-header:hover {
     color: #999999;
 }
 
-.card .card-body {
+.card .card-summary {
   padding: 0 20px;
   margin-top: 20px;
+}
+
+.card .card-content {
+    padding: 20px 20px;
 }
 
 .miniTagContainer {

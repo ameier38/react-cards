@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using ReactCards.Models;
 
@@ -12,12 +9,9 @@ namespace ReactCards.Controllers
     [Route("api/[controller]")]
     public class CardsController : Controller
     {
-        [FromServices]
-        public ICardsRepository CardsRepo { get; set; }
-        
         // GET: api/cards
         [HttpGet]
-        public IEnumerable<CardDTO> Get([FromQuery] int? tagId)
+        public IEnumerable<CardDTO> Get([FromQuery] int? tagId, [FromServices] ICardsRepository CardsRepo)
         {
             if (tagId == null)
             {
@@ -30,10 +24,15 @@ namespace ReactCards.Controllers
         }
 
         // GET api/cards/5
-        [HttpGet("{cardPath}")]
-        public IActionResult Get(string cardPath)
+        [HttpGet("{cardId}")]
+        public IActionResult Get(int cardId, [FromServices] ICardsRepository CardsRepo)
         {
-            return View("~/Views/CardDetails/" + cardPath);
+            var card = CardsRepo.GetCardDetails(cardId);
+            if (card == null)
+            {
+                return HttpNotFound();
+            }
+            return new ObjectResult(card);
         }
 
         //// POST api/values

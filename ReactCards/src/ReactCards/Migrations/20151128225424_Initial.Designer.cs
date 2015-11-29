@@ -8,9 +8,10 @@ using ReactCards.Models;
 namespace ReactCards.Migrations
 {
     [DbContext(typeof(CardContext))]
-    partial class CardContextModelSnapshot : ModelSnapshot
+    [Migration("20151128225424_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16432")

@@ -10,15 +10,14 @@ var TagContainer = React.createClass({
     render: function () {
         var tagNodes = this.props.tags.map(function (tag) {
             return (
-                <Tag key={tag.Id} onTagClick={this.props.onTagClick.bind(null, '?tagId=' + tag.Id)} tagName={tag.Name} />
+                <Tag key={tag.Id} onTagClick={this.props.onTagClick.bind(null, tag.Id)} tagName={tag.Name} />
             );
         }.bind(this));
         return (
             <div className="container tagContainer">
                 <Well>
                     <ButtonToolbar>
-                        <Button bsStyle="primary" onClick={this.props.onTagClick.bind(null,'')}>Reset</Button>
-                        {tagNodes}
+                        <Button bsStyle="primary" onClick={this.props.onTagClick.bind(null,null)}>Reset</Button>{tagNodes}
                     </ButtonToolbar>
                 </Well>
             </div>
@@ -36,18 +35,29 @@ var Tag = React.createClass({
 
 var CardContainer = React.createClass({
     render: function () {
-        var cardNodes = this.props.cards.map(function (card) {
+        var cardDetail = this.props.cardDetail;
+        if (cardDetail != null) {
             return (
-                <Card key={card.Id} title={card.Title} summary={card.Summary} date={card.CreatedDate} url={this.props.cardApi + "/" + card.Path} tags={card.Tags} onTagClick={this.props.onTagClick}/>
+                <div className="container cardContainer">
+                    <Row>
+                        <CardDetail title={cardDetail.Title} createdDate={cardDetail.CreatedDate} content={cardDetail.Content} />
+                    </Row>
+                </div>
             );
-        }.bind(this));
-        return (
-            <div className="container cardContainer">
-                <Row>
-                    {cardNodes}
-                </Row>
-            </div>
-        );
+        } else {
+            var cardNodes = this.props.cards.map(function (card) {
+                return (
+                    <Card key={card.Id} title={card.Title} summary={card.Summary} createdDate={card.CreatedDate} tags={card.Tags} onTagClick={this.props.onTagClick} onCardClick={this.props.onCardClick.bind(null,card.Id)} />
+                );
+            }.bind(this));
+            return (
+                <div className="container cardContainer">
+                    <Row>
+                        {cardNodes}
+                    </Row>
+                </div>
+            );
+        }
     }
 });
 
@@ -56,14 +66,33 @@ var Card = React.createClass({
         return (
             <Col xs={12} md={6}>
                 <div className="card">
-                    <a className="card-header" href={this.props.url} >
+                    <div className="card-header clickable" onClick={this.props.onCardClick}>
                         <h3 className="card-header-title">{this.props.title}</h3>
-                        <span className="card-header-date">{this.props.date}</span>
-                    </a>
-                    <div className="card-body">
+                        <span className="card-header-date">{this.props.createdDate}</span>
+                    </div>
+                    <div className="card-summary">
                         <p>{this.props.summary}</p>
                     </div>
                     <MiniTagContainer tags={this.props.tags} onTagClick={this.props.onTagClick} />
+                </div>
+            </Col>
+        );
+    }
+});
+
+var CardDetail = React.createClass({
+    render: function () {
+        var content = { __html: this.props.content };
+        return (
+            <Col xs={12}>
+                <div className="card">
+                    <div className="card-header">
+                        <h3 className="card-header-title">{this.props.title}</h3>
+                        <span className="card-header-date">{this.props.createdDate}</span>
+                    </div>
+                    <div className="card-content">
+                        <div dangerouslySetInnerHTML={content} />
+                    </div>
                 </div>
             </Col>
         );
@@ -74,7 +103,7 @@ var MiniTagContainer = React.createClass({
     render: function () {
         var tagNodes = this.props.tags.map(function (tag) {
             return (
-                <MiniTag key={tag.Id} onTagClick={this.props.onTagClick.bind(null, '?tagId=' + tag.Id)} tagName={tag.Name} />
+                <MiniTag key={tag.Id} onTagClick={this.props.onTagClick.bind(null, tag.Id)} tagName={tag.Name} />
             );
         }.bind(this));
         return (
@@ -96,50 +125,52 @@ var MiniTag = React.createClass({
 });
 
 var PageContainer = React.createClass({
-    loadCardsFromServer: function (url) {
+    loadFromServer: function (stateProp, apiUrl) {
         var xhr = new XMLHttpRequest();
-        xhr.open('get', url, true);
+        xhr.open("get", apiUrl, true);
         xhr.onload = function () {
             var data = JSON.parse(xhr.responseText);
-            this.setState({ cards: data });
-        }.bind(this);
-        xhr.send();
-    },
-    loadTagsFromServer: function (url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('get', url, true);
-        xhr.onload = function () {
-            var data = JSON.parse(xhr.responseText);
-            this.setState({ tags: data });
+            var stateObject = function () {
+                returnObj = {};
+                returnObj[stateProp] = data;
+                return returnObj;
+            };
+            this.setState(stateObject);
         }.bind(this);
         xhr.send();
     },
     getInitialState: function () {
         return {
             cards: [],
+            cardDetail: null,
             tags: []
         };
     },
     componentDidMount: function () {
-        this.loadTagsFromServer(this.props.tagApi);
-        this.loadCardsFromServer(this.props.cardApi);
+        this.loadFromServer("tags", "api/tags");
+        this.loadFromServer("cards", "api/cards");
     },
-    handleTagClick: function (qry, event) {
-        var url = this.props.cardApi + qry;
-        this.loadCardsFromServer(url);
+    handleTagClick: function (tagId) {
+        var qry = "";
+        if (tagId != null) qry = "?tagId=" + tagId;
+        this.setState({ cardDetail: null })
+        this.loadFromServer("cards", "api/cards" + qry);
+    },
+    handleCardClick: function (cardId) {
+        var apiUrl = "api/cards/" + cardId;
+        this.loadFromServer("cardDetail", apiUrl);
     },
     render: function () {
         return (
             <div className="pageContainer">
                 <TagContainer onTagClick={this.handleTagClick} tags={this.state.tags} />
-                <CardContainer onTagClick={this.handleTagClick} cards={this.state.cards} cardApi={this.props.cardApi} />
+                <CardContainer onTagClick={this.handleTagClick} onCardClick={this.handleCardClick} cards={this.state.cards} cardDetail={this.state.cardDetail} />
             </div>
         );
     }
 });
 
 ReactDOM.render(
-    <PageContainer tagApi="api/tags" cardApi ="api/cards" />,
+    <PageContainer />,
     mountNode
 );
-

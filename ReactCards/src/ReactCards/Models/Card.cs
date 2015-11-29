@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReactCards.Models
 {
@@ -8,7 +9,8 @@ namespace ReactCards.Models
         public string Title { get; set; }
         public string Summary { get; set; }
         public System.DateTime CreatedDate { get; set; }
-        public string Path { get; set; }
+        [Column(TypeName = "ntext")]
+        public string Content { get; set; }
 
         //many-to-many mapper
         public ICollection<CardTag> CardTags { get; set; }

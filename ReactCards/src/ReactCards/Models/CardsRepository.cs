@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Data.Entity;
-using System.Web;
-using Microsoft.AspNet.Mvc;
 
 namespace ReactCards.Models
 {
@@ -25,7 +21,6 @@ namespace ReactCards.Models
                 Title = c.Title,
                 Summary = c.Summary,
                 CreatedDate = c.CreatedDate.ToString("MMMM dd, yyyy"),
-                Path = c.Path,
                 Tags = c.CardTags.Select(ct => new TagDTO()
                 {
                     Id = ct.Tag.Id,
@@ -45,7 +40,6 @@ namespace ReactCards.Models
                                             Title = c.Title,
                                             Summary = c.Summary,
                                             CreatedDate = c.CreatedDate.ToString("MMMM dd, yyyy"),
-                                            Path = c.Path,
                                             Tags = c.CardTags.Select(ct => new TagDTO()
                                             {
                                                 Id = ct.Tag.Id,
@@ -53,6 +47,33 @@ namespace ReactCards.Models
                                             }).ToList()
                                         });
             return cards;
+        }
+
+        public CardDetailDTO GetCardDetails(int cardId)
+        {
+            var card = _context.Cards.Include(c => c.CardTags).ThenInclude(ct => ct.Tag).FirstOrDefault(c => c.Id == cardId);
+            if (card == null)
+            {
+                return null;
+            }
+            else
+            {
+                var cardDetail = new CardDetailDTO()
+                {
+                    Id = card.Id,
+                    Title = card.Title,
+                    CreatedDate = card.CreatedDate.ToString("MMMM dd, yyyy"),
+                    Content = card.Content,
+                    Tags = card.CardTags.Select(ct => new TagDTO()
+                    {
+                        Id = ct.Tag.Id,
+                        Name = ct.Tag.Name
+                    }).ToList()
+                };
+
+                return cardDetail;
+            }
+
         }
 
         public IEnumerable<TagDTO> GetTags()

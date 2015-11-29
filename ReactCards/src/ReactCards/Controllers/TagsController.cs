@@ -12,12 +12,9 @@ namespace ReactCards.Controllers
     [Route("api/[controller]")]
     public class TagsController : Controller
     {
-        [FromServices]
-        public ICardsRepository CardsRepo { get; set; }
-
         // GET: api/tags
         [HttpGet]
-        public IEnumerable<TagDTO> Get()
+        public IEnumerable<TagDTO> Get([FromServices] ICardsRepository CardsRepo)
         {
             return CardsRepo.GetTags();
         }

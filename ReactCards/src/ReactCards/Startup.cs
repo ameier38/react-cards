@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Diagnostics;
+﻿using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Dnx.Runtime;
 using ReactCards.Models;
 using Microsoft.Data.Entity;
-using Newtonsoft.Json;
 using Microsoft.Extensions.PlatformAbstractions;
 
 namespace ReactCards
@@ -60,7 +51,7 @@ namespace ReactCards
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, SampleData sampleData)
         {
             loggerFactory.MinimumLevel = LogLevel.Information;
-            loggerFactory.AddConsole();
+            loggerFactory.AddConsole(LogLevel.Verbose);
 
             // Configure the HTTP request pipeline.
             app.UseIISPlatformHandler();
